@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Education | YFII</title>
+<link rel="stylesheet" href="../assets/styles.css">
+</head>
+<body data-content="education">
+<a class="skip" href="#main">Skip to main content</a>
+<header class="topbar">
+  <div class="top-inner">
+    <a class="brand" href="../index.html">
+      <img src="../assets/yfii-logo.jpg" alt="Youth for Inclusive India logo">
+      <span class="brand-text"><strong>Youth for Inclusive India (YFII)</strong><span>Empowering. United. Progressive.</span></span>
+    </a>
+    <div>
+      <button id="menuBtn" class="menu-btn" aria-expanded="false">More Menu</button>
+      <nav id="siteMenu" class="menu">
+        <a href="events.html">Events</a><a href="stories.html">Stories</a><a href="donate.html">Donate</a><a href="about.html">About Us</a>
+      </nav>
+    </div>
+  </div>
+</header>
+
+<main id="main" class="page education-page">
+  <h1>Education</h1>
+  <p>Choose the type of learning material you want to explore. Each section has its own search box so different types of resources do not get mixed together.</p>
+
+  <section aria-labelledby="resource-types-heading">
+    <h2 id="resource-types-heading" class="visually-hidden">Education resource types</h2>
+    <div class="education-type-grid" role="list">
+      <button type="button" class="education-type-card education-pdf" data-resource-type="pdf" aria-controls="educationBrowser" aria-pressed="false" role="listitem">
+        <span class="education-type-icon" aria-hidden="true">PDF</span>
+        <span class="education-type-title">PDF</span>
+        <span class="education-type-subtitle">Study material and documents</span>
+      </button>
+      <button type="button" class="education-type-card education-audio" data-resource-type="audio" aria-controls="educationBrowser" aria-pressed="false" role="listitem">
+        <span class="education-type-icon" aria-hidden="true">Audio</span>
+        <span class="education-type-title">Audio</span>
+        <span class="education-type-subtitle">Listen to accessible learning content</span>
+      </button>
+      <button type="button" class="education-type-card education-video" data-resource-type="video" aria-controls="educationBrowser" aria-pressed="false" role="listitem">
+        <span class="education-type-icon" aria-hidden="true">Video</span>
+        <span class="education-type-title">Video</span>
+        <span class="education-type-subtitle">Watch learning resources</span>
+      </button>
+      <button type="button" class="education-type-card education-notes" data-resource-type="notes" aria-controls="educationBrowser" aria-pressed="false" role="listitem">
+        <span class="education-type-icon" aria-hidden="true">Notes</span>
+        <span class="education-type-title">Notes</span>
+        <span class="education-type-subtitle">Class notes and written guidance</span>
+      </button>
+    </div>
+  </section>
+
+  <section id="educationBrowser" class="education-browser" aria-labelledby="educationBrowserTitle" hidden>
+    <div class="education-browser-header">
+      <div>
+        <p class="education-current-type" id="educationCurrentType">PDF</p>
+        <h2 id="educationBrowserTitle">PDF Resources</h2>
+        <p id="educationBrowserHelp" class="help-text">Search within PDF resources.</p>
+      </div>
+      <button type="button" id="changeEducationType" class="btn secondary">Change resource type</button>
+    </div>
+
+    <form id="educationSearchForm" class="search education-search" role="search">
+      <label for="educationSearch">Search PDF resources</label>
+      <input id="educationSearch" type="search" placeholder="Search PDFs by title, subject or topic" autocomplete="off">
+      <button class="btn" type="submit">Search</button>
+    </form>
+
+    <div id="educationResults" class="result-list" aria-live="polite" aria-busy="false"></div>
+  </section>
+</main>
+
+<nav class="dock" aria-label="Primary navigation">
+  <div class="dock-inner">
+    <a href="../index.html">Home</a>
+    <a href="scribe.html">Scribe Assistant</a>
+    <a href="education.html" class="active">Education</a>
+    <a href="get-involved.html">Get Involved</a>
+  </div>
+</nav>
+
+<script src="../js/config.js"></script>
+<script src="../js/api.js"></script>
+<script src="../js/main.js"></script>
+</body>
+</html>

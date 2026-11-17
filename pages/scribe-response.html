@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>YFII Scribe Response</title>
+<meta http-equiv="refresh" content="0; url=https://script.google.com/macros/s/AKfycbxwnQ1Ee-ov-JfSocvLYfK16ar2hwC_ByLhVRzK-V_2k9uHOgGxmKL3nXq3YHf5sYGOFw/exec?action=scribe-response">
+</head>
+<body>
+<main>
+<h1>YFII Scribe Response</h1>
+<p>Opening your secure response page…</p>
+<p>If the page does not open automatically, <a id="open" href="#">open the secure response page</a>.</p>
+</main>
+<script>
+(function () {
+  var token = new URLSearchParams(window.location.search).get('token') || '';
+  var target = 'https://script.google.com/macros/s/AKfycbxwnQ1Ee-ov-JfSocvLYfK16ar2hwC_ByLhVRzK-V_2k9uHOgGxmKL3nXq3YHf5sYGOFw/exec?action=scribe-response&token=' + encodeURIComponent(token);
+  document.getElementById('open').href = target;
+  window.location.replace(target);
+}());
+</script>
+</body>
+</html>
