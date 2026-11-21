@@ -125,7 +125,7 @@ function renderContentItem_(x,type){
     : '';
 
   const metaHtml=meta.length
-    ? `<div class="content-meta">${meta.map(v=>`<span>${esc(v)}</span>`).join('')}</div>`
+    ? `<div class="content-meta">${meta.map(v=>`<span>${esc(v)}</span>`).join(' ')}</div>`
     : '';
 
   return `<article class="result content-card">
