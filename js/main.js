@@ -16,39 +16,73 @@ function field_(x,keys){for(const k of keys){const v=String(x?.[k]??'').trim();i
 function mediaUrl_(x,keys){return field_(x,keys)}
 function youtubeEmbedUrl_(url){try{const u=new URL(String(url));let id='';const h=u.hostname.toLowerCase();if(h==='youtu.be')id=u.pathname.replace(/^\//,'').split('/')[0];else if(h==='youtube.com'||h==='www.youtube.com'||h==='m.youtube.com'){if(u.pathname==='/watch')id=u.searchParams.get('v')||'';else if(u.pathname.startsWith('/shorts/'))id=u.pathname.split('/')[2]||'';else if(u.pathname.startsWith('/embed/'))id=u.pathname.split('/')[2]||''}if(!/^[A-Za-z0-9_-]{6,}$/.test(id))return '';return `https://www.youtube.com/embed/${id}`}catch(e){return ''}}
 function mediaActions_(x,type){const youtube=mediaUrl_(x,['YouTube','Youtube','youtube','Video','video','videoUrl','VideoURL']);const audio=mediaUrl_(x,['Audio','audio','audioUrl','AudioURL']);const pdf=mediaUrl_(x,['PDF','pdf','pdfUrl','PDFURL','pdfURL']);const notes=mediaUrl_(x,['Notes','notes','notesUrl','NotesURL']);const registration=type==='events'?mediaUrl_(x,['Registration URL','RegistrationURL','registrationUrl','registrationURL']):'';let links='';if(youtube)links+=`<a href="${esc(youtube)}" target="_blank" rel="noopener noreferrer">Watch Video</a>`;if(audio)links+=`<a href="${esc(audio)}" target="_blank" rel="noopener noreferrer">Play Audio</a>`;if(pdf)links+=`<a href="${esc(pdf)}" target="_blank" rel="noopener noreferrer">Open PDF</a>`;if(notes)links+=`<a href="${esc(notes)}" target="_blank" rel="noopener noreferrer">Open Notes</a>`;if(registration)links+=`<a href="${esc(registration)}" target="_blank" rel="noopener noreferrer">Register for this Event</a>`;if(!links)return '';const embed=youtube?youtubeEmbedUrl_(youtube):'';return `<div class="content-media-actions">${links}${embed?`<div class="content-video"><iframe src="${esc(embed)}" title="${esc(field_(x,['Title','title','Name','name'])||type+' video')}" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe></div>`:''}</div>`}
-function formatEventDateTime_(value,type){
-  const s=String(value??'').trim();
-  if(!s)return '';
-
-  const d=new Date(s);
-
-  if(!isNaN(d.getTime())){
-    if(type==='date'){
-      return d.toLocaleDateString('en-IN',{
-        day:'2-digit',
-        month:'2-digit',
-        year:'numeric'
-      });
-    }
-
-    if(type==='time'){
-      return d.toLocaleTimeString('en-IN',{
-        hour:'2-digit',
-        minute:'2-digit',
-        hour12:true
-      });
-    }
-  }
-
-  return s
-}
-
 function renderContentItem_(x,type){
   const title=field_(x,['Title','title','Name','name','Subject','subject'])||'Untitled';
 
   const desc=type==='stories'
-    ?field_(x,['Story','story','Description','description','Content','content','Summary','summary'])
-    :field_(x,['Description','description','Content','content','Summary','summary']);
+    ? field_(x,['Story','story','Description','description','Content','content','Summary','summary'])
+    : field_(x,['Description','description','Content','content','Summary','summary']);
+
+  function formatDate_(value){
+    const s=String(value??'').trim();
+    if(!s)return '';
+
+    if(/^\d{1,2}\/\d{1,2}\/\d{4}$/.test(s))return s;
+
+    let m=s.match(/^[A-Za-z]{3}\s+[A-Za-z]{3}\s+(\d{1,2})\s+(\d{4})/);
+    if(m){
+      const monthMap={
+        Jan:'01',Feb:'02',Mar:'03',Apr:'04',May:'05',Jun:'06',
+        Jul:'07',Aug:'08',Sep:'09',Oct:'10',Nov:'11',Dec:'12'
+      };
+      const month=s.slice(4,7);
+      const day=String(m[1]).padStart(2,'0');
+      const year=m[2];
+      if(monthMap[month])return `${day}/${monthMap[month]}/${year}`;
+    }
+
+    const d=new Date(s);
+    if(!Number.isNaN(d.getTime())){
+      return `${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')}/${d.getFullYear()}`;
+    }
+
+    return s;
+  }
+
+  function formatTime_(value){
+    const s=String(value??'').trim();
+    if(!s)return '';
+
+    let m=s.match(/(\d{1,2}):(\d{2})(?::\d{2})?\s*(AM|PM)/i);
+    if(m){
+      let h=Number(m[1]);
+      let min=Number(m[2]);
+      return `${h}:${String(min).padStart(2,'0')} ${m[4].toUpperCase()}`;
+    }
+
+    m=s.match(/(\d{1,2}):(\d{2})(?::\d{2})?/);
+    if(m){
+      let h=Number(m[1]);
+      let min=Number(m[2]);
+
+      if(h>=0 && h<=23 && min>=0 && min<=59){
+        const ap=h>=12?'PM':'AM';
+        const hh=h%12||12;
+        return `${hh}:${String(min).padStart(2,'0')} ${ap}`;
+      }
+    }
+
+    const d=new Date(s);
+    if(!Number.isNaN(d.getTime())){
+      let h=d.getHours();
+      const min=d.getMinutes();
+      const ap=h>=12?'PM':'AM';
+      h=h%12||12;
+      return `${h}:${String(min).padStart(2,'0')} ${ap}`;
+    }
+
+    return s;
+  }
 
   const meta=[];
 
@@ -57,43 +91,42 @@ function renderContentItem_(x,type){
     const start=field_(x,['Start time','startTime','Start Time']);
     const end=field_(x,['End time','endTime','End Time']);
 
-    const dateValue=formatEventDateTime_(date,'date');
-    const startValue=formatEventDateTime_(start,'time');
-    const endValue=formatEventDateTime_(end,'time');
+    if(date)meta.push(formatDate_(date));
+    if(start)meta.push(formatTime_(start));
+    if(end)meta.push(formatTime_(end));
 
-    if(dateValue)meta.push(dateValue);
-    if(startValue)meta.push(startValue);
-    if(endValue)meta.push(endValue);
-
-    [['Location','location'],['City','city'],['Type','type'],['Category','category']]
-      .forEach(keys=>{
-        const v=field_(x,keys);
-        if(v)meta.push(v)
-      })
+    [
+      ['Location','location'],
+      ['City','city'],
+      ['Type','type'],
+      ['Category','category']
+    ].forEach(keys=>{
+      const v=field_(x,keys);
+      if(v)meta.push(v);
+    });
   }
-
   else if(type==='stories'){
-    [['Person / organization','Person / Organization','person','organization'],
-     ['Category','category']]
-      .forEach(keys=>{
-        const v=field_(x,keys);
-        if(v)meta.push(v)
-      });
+    [
+      ['Person / organization','Person / Organization','person','organization'],
+      ['Category','category']
+    ].forEach(keys=>{
+      const v=field_(x,keys);
+      if(v)meta.push(v);
+    });
 
-    const storyDate=field_(x,['Date','date']);
-    const storyDateValue=formatEventDateTime_(storyDate,'date');
-    if(storyDateValue)meta.push(storyDateValue)
+    const date=field_(x,['Date','date']);
+    if(date)meta.push(formatDate_(date));
   }
 
   const photo=mediaUrl_(x,['Photo','photo','Image','image','Photo URL','PhotoURL']);
 
   const photoHtml=photo
-    ?`<div class="content-photo"><img src="${esc(photo)}" alt="${esc(title+' photo')}" loading="lazy"></div>`
-    :'';
+    ? `<div class="content-photo"><img src="${esc(photo)}" alt="${esc(title+' photo')}" loading="lazy"></div>`
+    : '';
 
   const metaHtml=meta.length
-    ?`<div class="content-meta">${meta.map(v=>`<span>${esc(v)}</span>`).join('')}</div>`
-    :'';
+    ? `<div class="content-meta">${meta.map(v=>`<span>${esc(v)}</span>`).join('')}</div>`
+    : '';
 
   return `<article class="result content-card">
     <h3>${esc(title)}</h3>
@@ -101,7 +134,7 @@ function renderContentItem_(x,type){
     ${photoHtml}
     ${metaHtml}
     ${mediaActions_(x,type)}
-  </article>`
+  </article>`;
 }
 async function loadContent(type){const box=$('#results');if(!box)return;const q=$('#search')?.value||'';box.setAttribute('aria-busy','true');box.innerHTML='<div class="empty">Loading...</div>';try{const r=await YFII_API.get({action:type,q,limit:50});const items=r.items||r.data||[];if(!items.length){box.setAttribute('aria-busy','false');box.innerHTML='<div class="empty">No results found.</div>';return}box.innerHTML=items.map(x=>renderContentItem_(x,type)).join('');box.setAttribute('aria-busy','false')}catch(e){box.setAttribute('aria-busy','false');box.innerHTML='<div class="empty">Content could not be loaded right now. Please try again.</div>'}}
 function resourceField_(x,keys){for(const key of keys){const value=String(x?.[key]??'').trim();if(value)return value}return ''}
